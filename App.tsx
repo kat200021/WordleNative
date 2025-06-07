@@ -11,6 +11,8 @@ const App = () => {
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState<{ word: string; result: string[] }[]>([]);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [keyStatuses, setKeyStatuses] = useState<{ [key: string]: string }>({});
+
 
   // pick a random word at the start
   useEffect(() => {
@@ -52,6 +54,24 @@ const App = () => {
           if (currentGuess.length === 5) {
             const result = checkGuess(currentGuess, solution);
             const newGuesses = [...guesses, { word: currentGuess, result }];
+            const updatedKeys = { ...keyStatuses };
+            for (let i = 0; i < 5; i++) {
+              const letter = currentGuess[i];
+              const status = result[i];
+              const prevStatus = updatedKeys[letter];
+          
+              if (prevStatus !== 'correct') {
+                if (status === 'correct') {
+                  updatedKeys[letter] = 'correct';
+                } else if (status === 'present' && prevStatus !== 'present') {
+                  updatedKeys[letter] = 'present';
+                } else if (!prevStatus) {
+                  updatedKeys[letter] = 'absent';
+                }
+              }
+            }
+          
+            setKeyStatuses(updatedKeys);
             setGuesses(newGuesses);
             setCurrentGuess('');
             if (currentGuess === solution || newGuesses.length === 6) {
@@ -63,7 +83,9 @@ const App = () => {
             setCurrentGuess((prev) => prev + key.toLowerCase());
           }
         }
-      }} />
+      }} 
+      keyStatuses={keyStatuses}
+      />
 
     </SafeAreaView>
   );

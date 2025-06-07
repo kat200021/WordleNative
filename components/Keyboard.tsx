@@ -9,9 +9,18 @@ const KEYS = [
 
 type Props = {
   onKeyPress: (key: string) => void;
+  keyStatuses: { [key: string]: string };
 };
 
-const Keyboard: React.FC<Props> = ({ onKeyPress }) => {
+
+const Keyboard: React.FC<Props> = ({ onKeyPress, keyStatuses }) => {
+    const getKeyStyle = (key: string) => {
+        const status = keyStatuses[key.toLowerCase()];
+        if (status === 'correct') return { backgroundColor: 'green' };
+        if (status === 'present') return { backgroundColor: 'orange' };
+        if (status === 'absent') return { backgroundColor: 'darkgrey' };
+        return { backgroundColor: 'lightgrey' };
+      };
   return (
     <View style={styles.container}>
       {KEYS.map((row, rowIndex) => (
@@ -19,10 +28,7 @@ const Keyboard: React.FC<Props> = ({ onKeyPress }) => {
           {row.map((key) => (
             <TouchableOpacity
               key={key}
-              style={[
-                styles.key,
-                key === 'ENTER' || key === '⌫' ? styles.wideKey : {},
-              ]}
+              style={[styles.key, getKeyStyle(key)]}
               onPress={() => onKeyPress(key)}
             >
               <Text style={styles.keyText}>{key}</Text>
